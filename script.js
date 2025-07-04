@@ -1,37 +1,39 @@
 const btns = document.querySelectorAll(".box")
+const wonPopUp = document.querySelector(".won")
 
-
+// addes eventlistener to every cell .Deletes eventlistener when cell is clicked
 btns.forEach((btn)=>{
     btn.addEventListener("click",()=>{
+
         btn.innerHTML = `<svg width="100" height="100" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z" fill="black"/>
-                            </svg>
-                            `
-        btn.classList.add("cross")
-        computerMove()
-        const newBtn = btn.cloneNode(true);
+                            </svg>`
 
-        // Replace the old button with the new one
+        btn.classList.add("cross")
+        checkForWin("cross")
+        computerMove()
+        checkForWin("circle")
+        
+        const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
     })
-    
 })
 
-for(let i = 0;i<btns.length;i++){
-    let btn = btns[i]
-    btn.classList.add(i)
+// if either side fills this positions game ends 
+const winningPositions = {
+     hor1: document.querySelectorAll(".box:nth-child(-n+3)"),
+     hor2: document.querySelectorAll(".box:nth-child(n+4):nth-child(-n+6)"),
+     hor3: document.querySelectorAll(".box:nth-child(n+7)"),
+
+     ver1: document.querySelectorAll(".box:nth-child(3n-2)"),
+     ver2: document.querySelectorAll(".box:nth-child(3n-1)"),
+     ver3: document.querySelectorAll(".box:nth-child(3n)"),
+
+     diag1: document.querySelectorAll(".box:nth-child(1), .box:nth-child(5), .box:nth-child(9)"),
+     diag2: document.querySelectorAll(".box:nth-child(3), .box:nth-child(5), .box:nth-child(7)"),
 }
-const hor1 = document.querySelectorAll(".box:nth-child(-n+3)");
-const hor2 = document.querySelectorAll(".box:nth-child(n+4):nth-child(-n+6)");
-const hor3 = document.querySelectorAll(".box:nth-child(n+7)");
 
-const ver1 = document.querySelectorAll(".box:nth-child(3n-2)");
-const ver2 = document.querySelectorAll(".box:nth-child(3n-1)");
-const ver3 = document.querySelectorAll(".box:nth-child(3n)");
-
-const diag1 = document.querySelectorAll(".box:nth-child(1), .box:nth-child(5), .box:nth-child(9)");
-const diag2 = document.querySelectorAll(".box:nth-child(3), .box:nth-child(5), .box:nth-child(7)");
-
+//makes computer Move(randomly chooses from cells that hasnt been already taken)
 function computerMove(){
     const availabeSpots = []
     btns.forEach(btn=>{
@@ -39,7 +41,6 @@ function computerMove(){
             availabeSpots.push(btn)
         }
     })
-    console.log(availabeSpots)
     let randomSpot = Math.floor(Math.random()*availabeSpots.length)
     let availabeSpot = availabeSpots[randomSpot]
     availabeSpot.classList.add("circle")
@@ -49,20 +50,23 @@ function computerMove(){
                             `
     const newBtn = availabeSpot.cloneNode(true);
 
-        // Replace the old button with the new one
         availabeSpot.parentNode.replaceChild(newBtn, availabeSpot);
 }
-function userMove(btn){
-        btn.innerHTML = `<svg width="100" height="100" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z" fill="black"/>
-                            </svg>
-                            `
-        btn.classList.add("cross")
-        computerMove()
+
+//checks is either side filled one of winning positions
+function checkForWin(side){
+    console.log("invoked");
+    const positions = Object.values(winningPositions);
+    
+    positions.forEach(position => {
+        console.log(position);
+        const positionArray = Array.from(position);
+        if (positionArray.every(cell => cell.classList.contains(side))) {
+            wonPopUp.textContent = side=="cross"?"you won":"ai won"
+            wonPopUp.style.display = "flex"
+            
+        }
         
+        console.log("position ended");
+    });
 }
-fetch(`https://tictactoe-game.up.railway.app/start`,{
-    method:`POST`,
-})
-    .then(res=>res.json())
-    .then(data=>console.log(data))
